@@ -1,0 +1,40 @@
+.\" sampled utility manual page.
+.TH "SAMPLEUTIL" "8" "August 2007" "fakehalo" "Sample"
+.SH "NAME"
+samputil \- \fBsampled\fR execution utility
+.SH "SYNOPSIS"
+\fBsamputil\fR [\fIoption\fR]
+.SH "DESCRIPTION"
+.PP 
+\fBsamputil\fR is a shell script to control \fBsampled\fR
+
+.SH "OPTIONS"
+.TP 
+\fBstart\fR
+start \fBsampled\fR
+.TP 
+\fBstop\fR
+stop \fBsampled\fR
+.TP 
+\fBrestart\fR
+restart \fBsampled\fR
+.TP 
+\fBreset\fR
+reset \fBsampled\fR (this stops all of the \fBsampled\fR active user processors, without stopping the daemon)
+.TP 
+\fBclear\fR
+clear \fBsampled\fR user cache
+.TP 
+\fBstatus\fR
+reports the running status of \fBsampled\fR
+.SH "AUTHOR"
+Written by v9/fakehalo. [v9@fakehalo.us]
+.SH "BUGS"
+Report bugs to <v9@fakehalo.us>.
+.SH "COPYRIGHT"
+Copyright \(co 2007 fakehalo.
+.br 
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "SEE ALSO"
+sample(1) samples(1) sample.conf(5) sampled(8)

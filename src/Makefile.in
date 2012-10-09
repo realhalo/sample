@@ -1,0 +1,26 @@
+SAMPLED_SOURCES = cache.c conf.c env.c errord.c limit.c misc.c sampled.c shared.c signal.c string.c title.c users.c wpid.c
+SAMPLED_OBJECTS = cache.o conf.o env.o errord.o limit.o misc.o sampled.o shared.o signal.o string.o title.o users.o wpid.o
+SAMPLED_OUTPUT = sampled
+SAMPLE_SOURCES = editor.c error.c list.c sample.c validate.c
+SAMPLE_OBJECTS = editor.o error.o list.o sample.o shared.o validate.o
+SAMPLE_OUTPUT = sample
+SAMPLES_SOURCES = samples.c spool.c
+SAMPLES_OBJECTS = error.o samples.o shared.o spool.o
+SAMPLES_OUTPUT = samples
+CC = gcc
+LIBS = @LIBS@
+CFLAGS = -Wall
+
+all: sampled sample samples
+
+sampled: $(SAMPLED_OBJECTS)
+	$(CC) $(CFLAGS) -o $(SAMPLED_OUTPUT) $(SAMPLED_OBJECTS) $(LIBS)
+
+sample: $(SAMPLE_OBJECTS)
+	$(CC) $(CFLAGS) -o $(SAMPLE_OUTPUT) $(SAMPLE_OBJECTS) $(LIBS)
+
+samples: $(SAMPLES_OBJECTS)
+	$(CC) $(CFLAGS) -o $(SAMPLES_OUTPUT) $(SAMPLES_OBJECTS) $(LIBS)
+
+clean:
+	rm -f sampled sample samples samputil Makefile *core* *.o

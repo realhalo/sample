@@ -1,0 +1,42 @@
+PREFIX=@prefix@
+XX_PREFIX=@xx_prefix@
+BINDIR=${PREFIX}/bin
+SBINDIR=${PREFIX}/sbin
+ETCDIR=${XX_PREFIX}/etc
+VARDIR=${XX_PREFIX}/var
+MANDIR=@mandir@
+CONFPATH=@sampleconf@
+INSTALL=@INSTALL@
+
+all:
+	cd src; make; cd ..
+clean:
+	cd src; make clean; cd ..; rm -f Makefile config.cache config.status config.h config.log
+
+distclean: clean
+
+install: all
+	mkdir -p ${PREFIX};
+	mkdir -p ${SBINDIR};
+	mkdir -p ${BINDIR};
+	mkdir -p ${MANDIR};
+	mkdir -p ${MANDIR}/man1;
+	mkdir -p ${MANDIR}/man3;
+	mkdir -p ${MANDIR}/man5;
+	mkdir -p ${MANDIR}/man8;
+	mkdir -p ${VARDIR};
+	mkdir -p ${VARDIR}/run;
+	mkdir -p ${VARDIR}/log;
+	mkdir -p ${ETCDIR};
+	mkdir -p @sampletab@;
+	chmod 755 @sampletab@;
+	${INSTALL} -o 0 -g 0 -m 755 src/sampled ${SBINDIR}/@samplef@sampled;
+	${INSTALL} -o 0 -g 0 -m 755 src/sample ${BINDIR}/@samplef@sample;
+	${INSTALL} -o 0 -g 0 -m 755 src/samples ${BINDIR}/@samplef@samples;
+	${INSTALL} -o 0 -g 0 -m 755 src/samputil ${SBINDIR}/samputil;
+	${INSTALL} -o 0 -g 0 -m 644 etc/sample.conf ${CONFPATH};
+	${INSTALL} -o 0 -g 0 -m 644 man/sample.1 ${MANDIR}/man1/@samplef@sample.1;
+	${INSTALL} -o 0 -g 0 -m 644 man/samples.1 ${MANDIR}/man1/@samplef@samples.1;
+	${INSTALL} -o 0 -g 0 -m 644 man/sample.conf.5 ${MANDIR}/man5/;
+	${INSTALL} -o 0 -g 0 -m 644 man/sampled.8 ${MANDIR}/man8/@samplef@sampled.8;
+	${INSTALL} -o 0 -g 0 -m 644 man/samputil.8 ${MANDIR}/man8/;

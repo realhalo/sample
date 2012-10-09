@@ -1,0 +1,248 @@
+.\" sample client/interface manual page.
+.TH "SAMPLE" "1" "August 2007" "fakehalo" "Sample"
+.SH "NAME"
+sample \- interface to edit ~/.sample files
+.SH "SYNOPSIS"
+\fBsample\fR
+[\fB\-vnrlt\fR] [\fB\-u\fR \fIuser\fR] [\fB\-e\fR \fIeditor\fR]
+.SH "DESCRIPTION"
+.PP 
+\fBsample\fR and its associated tools are intended to monitor ("sample") outdated/oversized files and handle them in a user\-defined fashion.  this can involve deleting, moving, or updating with new content among other things.
+
+the \fBsample\fR program is a simple console\-based interface used to make and validate \fI~/.sample\fR files, similar to the respective use  of the crontab program.  however, the \fBsample\fR program is not required in any way to make your \fI~/.sample\fR file, it can be created/modified completely manually.
+
+if no command\-line arguments are specified for \fBsample\fR it will attempt to edit the current user's \fI~/.sample\fR file.
+.SH "OPTIONS"
+.TP 
+\fB\-v\fR
+shows the version information of \fBsample\fR
+.TP 
+\fB\-n\fR
+if \fBsample\fR is making a new \fI~/.sample\fR file, it will not include the "help" configuration comments
+.TP 
+\fB\-r\fR
+removes a user's \fI~/.sample\fR file (this can be used in conjunction with the \fB\-u\fR option)
+.TP 
+\fB\-l\fR
+(root\-only) lists all potentially processable \fI~/.sample\fR and spooled sample (\fI~/.sample_spool/*\fR) files.  this is for admin maintenance/monitoring purposes (does not list \fI/etc/sampletab/*\fR files as they are already consolidated)
+.TP 
+\fB\-t\fR
+(root\-only) switch to editing a user's "/etc/sampletab/\fBusername\fR", instead of "/home/\fBusername\fR/.sample" (this can be used in conjunction with the \fB\-u\fR option, this feature is explained in the \fBTABS\fR section)
+.TP 
+\fB\-u\fR \fIuser\fR
+(root\-only) modify a specified user's \fI~/.sample\fR file, instead of their own
+.TP 
+\fB\-e\fR \fIeditor\fR
+specify an alternate editor to edit your \fI~/.sample\fR file
+.SH "FORMAT"
+the format of your \fI~/.sample\fR file via the \fBsample\fR interface or by directly editing the file is a job\-per\-line format, similar to that of cron.  the format is:
+
+[\fBTYPE\fR]		[\fBTIME\fR|\fBSIZE\fR]		[\fBPATH\fR]		[\fBEXEC\fR]
+
+each value being separated by \fBTABS\fR (\\t).  the literal form of this is:
+
+"if \fBTYPE\fR has past \fBTIME\fR for a file contained in \fBPATH\fR then run \fBEXEC\fR"
+
+OR, for filesize comparisons:
+
+"if \fBTYPE\fR is smaller/larger than \fBSIZE\fR for a file contained in \fBPATH\fR then run \fBEXEC\fR"
+
+description of each field:
+
+.PP 
+.TP 
+field [\fBTYPE\fR]:
+value must be set to \fBone\fR of the following:
+.br 
+\fBA\fR	compare \fBTIME\fR to the last access of a file (older than)
+.br 
+\fBa\fR	compare \fBTIME\fR to the last access of a file (newer than)
+.br 
+\fBC\fR	compare \fBTIME\fR to the last status change of file (older than)
+.br 
+\fBc\fR	compare \fBTIME\fR to the last status change of file (newer than)
+.br 
+\fBM\fR	compare \fBTIME\fR to the last modification of file (older than)
+.br 
+\fBm\fR	compare \fBTIME\fR to the last modification of file (newer than)
+.br 
+\fBS\fR	compare \fBSIZE\fR to the size of file (greater than)
+.br 
+\fBs\fR	compare \fBSIZE\fR to the size of file (less than)
+.br 
+the lowercase versions of the above are lowercase because they are deemed less commonly used than the uppercase versions.
+
+.TP 
+field [\fBTIME\fR]:
+for types \fBA\fR, \fBa\fR, \fBC\fR, \fBc\fR, \fBM\fR and \fBm\fR.  the value must be set to one or a combination of the following:
+.br 
+\fBs\fR	seconds	(ex. "60s")
+.br 
+\fBm\fR	minutes	(ex. "60m")
+.br 
+\fBh\fR	hours	(ex. "24h")
+.br 
+\fBd\fR	days 	(ex. "7d")
+.br 
+\fBw\fR	weeks	(ex. "52w")
+.br 
+\fBM\fR	months	(ex. "12M")
+.br 
+\fBY\fR	years	(ex. "1Y")
+.br 
+there should be no spaces in this field, for example "\fB1h30m\fR" would be the equivalent of matching a 90\-minute or older file(s).
+
+.TP 
+field [\fBSIZE\fR]:
+for types \fBS\fR and \fBs\fR.  the value must be set to one or a combination of the following:
+.br 
+\fBB\fR	bytes	(ex. "1024B")
+.br 
+\fBK\fR	kilobytes	(ex. "1024K")
+.br 
+\fBM\fR	megabytes	(ex. "1024M")
+.br 
+\fBG\fR	gigabytes	(ex. "1G")
+.br 
+there should be no spaces in this field, for example "\fB1M512K\fR" would be the equivalent of matching a 1.5 meg file(s).
+
+.TP 
+field [\fBPATH\fR]:
+the \fBPATH\fR field can be separated by colons (\fB:\fR) to include multiple paths to check for outdated/oversized files.  this format follows the wildcard method supported by most shells, for example "\fB~/*.txt:~/*.rtf\fR" would attempt to find all outdated/oversized .txt and .rtf files in your home directory.
+
+.TP 
+field [\fBEXEC\fR]:
+this is executed if \fBsampled\fR finds an outdated/oversized file is found in \fBPATH\fR, the following variables will be filled in with their corresponding value:
+.br 
+\fB%%\fR	inserts a literal %
+.br 
+\fB%s\fR	exact path to the file matched		(shell\-escaped)
+.br 
+\fB%S\fR	exact path to the file matched		(NON\-escaped)
+.br 
+\fB%f\fR	only the filename of the matched path	(shell\-escaped)
+.br 
+\fB%F\fR	only the filename of the matched path	(NON\-escaped)
+.br 
+\fB%p\fR	only the path of the matched path		(shell\-escaped)
+.br 
+\fB%P\fR	only the path of the matched path		(NON\-escaped)
+.br 
+\fB%l\fR	symbolic link path, becomes \fB%s\fR if none	(shell\-escaped)
+.br 
+\fB%L\fR	symbolic link path, becomes \fB%S\fR if none	(NON\-escaped)
+.br 
+\fB%u\fR	file owner's user id
+.br 
+\fB%U\fR	file owner's user name
+.br 
+\fB%g\fR	file owner's group id
+.br 
+\fB%G\fR	file owner's group name
+.br 
+\fB%m\fR	(octal) file mode					(ex. "0777")
+.br 
+\fB%M\fR	(string) file mode					(ex. "\-rwxrwxrwx")
+.br 
+\fB%n\fR	size of the file in bytes
+.br 
+\fB%i\fR	inode of file
+.br 
+\fB%0\-9\fR	sub\-directory hierarchy variables
+.SH "TABS"
+sample tabs, found in /etc/sampletab/ by default, are sample files in exactly the same format as ~/.sample files except they are designed to be static and only editable by root.
+
+in general terms; "/etc/sampletab/\fBusername\fR" is the same as "/home/\fBusername\fR/.sample", except the user cannot edit the sampletab version.
+
+root can edit these files by appending the \fB\-t\fR argument to the \fBsample\fR command.
+.SH "EXAMPLE"
+.PP 
+
+.PP 
+.TP 
+an example \fI~/.sample\fR might look like:
+.br 
+
+# Set your desired shell. (may be restricted in some
+.br 
+# configurations)
+.br 
+\fBSHELL=/bin/sh\fR
+
+# Move old file(s) in the home directory to a sub\-folder if
+.br 
+# they haven't been accessed/read in over 6 months.
+.br 
+\fBA	6M		~				mv \-f \-\- %s ~/old/%f\fR
+
+# Remove (1.5 year old) unread inactive user's mail.
+.br 
+\fBA	1Y6M		/var/mail/		rm \-f \-\- %s\fR
+
+# Remove files in /tmp/* and /var/tmp/* after 1 week of no
+.br 
+# modifications.
+.br 
+\fBM	1w		/tmp:/var/tmp		rm \-f \-\- %s\fR
+
+# Update/regenerate a static (rss) webpage every 90 minutes.
+.br 
+# ("90m" also works)
+.br 
+\fBM	1h30m	~/www/site.rss		perl ~/make_rss.pl > %s\fR
+
+# This would essentially make a drop folder/directory in /drop/,
+.br 
+# which would simply process and delete any file placed in
+.br 
+# the directory. (sampled, by default, runs on the minute.
+.br 
+# meaning this would not actually process every second)
+.br 
+\fBM	1s		/drop/			~/proc.sh %s ; rm \-f \-\- %s\fR
+
+# This would delete 100 meg or larger files in your home
+.br 
+# directory.
+.br 
+\fBS	100M		~				rm \-f \-\- %s\fR
+
+# (root) Log rotation, make sure it's bash for this.  this will
+.br 
+# rotate *.log files in /var/log when they grow over 10MB. (the
+.br 
+# word\-wrap shown here is assumed to be on one line)
+.br 
+\fBSHELL=/bin/bash\fR
+.br 
+\fBS	10M		/var/log/*.log		for ((i=5;i>=0;i\-\-)); do mv
+.br 
+\-f %s.$i %s.$[i+1]; done; mv \-f %s %s.0; touch %s\fR
+
+.SH "ENVIRONMENT"
+environmental variables can be set by placing \fBVAR=VALUE\fR on a blank line in your \fI~/.sample\fR file.
+
+\fBsample\fR interface variables:
+.PP 
+.TP 
+\fBEDITOR\fR
+used to determine the text editor to edit the \fI~/.sample\fR file
+.TP 
+\fBPATH\fR
+used to determine the path of the text editor
+.SH "FILES"
+~/.sample
+.br 
+/etc/sampletab/
+.br 
+.SH "AUTHOR"
+Written by v9/fakehalo. [v9@fakehalo.us]
+.SH "BUGS"
+Report bugs to <v9@fakehalo.us>.
+.SH "COPYRIGHT"
+Copyright \(co 2007 fakehalo.
+.br 
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "SEE ALSO"
+samples(1) sample.conf(5) sampled(8) samputil(8)

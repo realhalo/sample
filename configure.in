@@ -1,0 +1,82 @@
+dnl Process this file with autoconf to produce a configure script.
+AC_INIT(src/sample.h, 1.x, v9@fakehalo.us)
+
+AC_PREFIX_DEFAULT(/usr)
+AC_CONFIG_HEADER([config.h])
+
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+
+AC_HEADER_STDC
+AC_CHECK_HEADERS([ctype.h fcntl.h getopt.h glob.h grp.h pwd.h signal.h string.h strings.h time.h sys/fcntl.h sys/file.h sys/resource.h sys/stat.h sys/time.h sys/types.h sys/wait.h unistd.h])
+
+AC_PROG_GCC_TRADITIONAL
+
+havelonglong=yes
+AC_MSG_CHECKING(for unsigned long long)
+AC_TRY_COMPILE([],[unsigned long long x; x = 0;], AC_DEFINE(HAVE_LONG_LONG, 1, has unsigned long long), havelonglong=no)
+AC_MSG_RESULT($havelonglong)
+
+AC_CHECK_FUNCS([glob malloc realloc signal stat strftime], , AC_MSG_ERROR(Missing required function for sample to compile))
+AC_CHECK_FUNCS([fchown initsetproctitle rewind setproctitle setrlimit setsid usleep waitpid])
+
+AC_ARG_WITH(passwd-file, [  --with-passwd-file=FILE specifies alternate passwd file. [/etc/passwd]], [passwd="$withval"], [passwd="/etc/passwd"])
+AC_DEFINE_UNQUOTED(SAM_PASSWD, "$passwd", passwd file path.)
+
+AC_ARG_ENABLE(strict-passwd, [  --enable-strict-passwd  specifies to only use the passwd file to find sample-capable users.], [strictpasswd="yes"], [strictpasswd="no"])
+if test "$strictpasswd" = "yes" ; then
+AC_DEFINE(SAM_STRICT_PASSWD, 1, strictly use the passwd file.)
+AC_CHECK_FILE("$passwd", , AC_MSG_ERROR(sample requires passwd file to exist with --enable-strict-passwd))
+fi
+
+AC_ARG_WITH(shells-file, [  --with-shells-file=FILE specifies alternate shells file. [/etc/shells]], [shells="$withval"], [shells="/etc/shells"])
+AC_DEFINE_UNQUOTED(SAM_SHELLS, "$shells", shell file path.)
+
+AC_CHECK_FILE("$shells", AC_DEFINE(HAVE_ETC_SHELLS, 1, has /etc/shells.), AC_MSG_WARN(shells file does not exist...not required to compile))
+
+
+if test $prefix = 'NONE';then
+xx_prefix="";
+prefix=/usr;
+mandir=/usr/share/man;
+else
+xx_prefix=$prefix;
+mandir=$prefix/man;
+fi
+AC_SUBST(xx_prefix)
+AC_SUBST(mandir)
+
+AC_ARG_WITH(tab-dir, [  --with-tab-dir=PATH     specifies alternate default sampletab directory. [/etc/sampletab/]], [sampletab="$withval"], [sampletab="$xx_prefix/etc/sampletab"])
+AC_DEFINE_UNQUOTED(SAM_TABDIR, "$sampletab", default sampletab path.)
+AC_SUBST(sampletab)
+
+AC_ARG_WITH(conf-file, [  --with-conf-file=FILE   specifies alternate default sampled conf file. [/etc/sample.conf]], [sampleconf="$withval"], [sampleconf="$xx_prefix/etc/sample.conf"])
+AC_DEFINE_UNQUOTED(SAM_CONFFILE, "$sampleconf", default sample config file path.)
+AC_SUBST(sampleconf)
+
+AC_ARG_WITH(pid-file, [  --with-pid-file=FILE    specifies alternate default sampled pid file. [/var/run/sampled.pid]], [samplepid="$withval"], [samplepid="$xx_prefix/var/run/sampled.pid"])
+AC_DEFINE_UNQUOTED(SAM_DEF_PIDFILE, "$samplepid", default sample pid file path.)
+AC_SUBST(samplepid)
+
+AC_ARG_WITH(log-file, [  --with-log-file=FILE    specifies alternate default sampled log file. [/var/log/sample.log]], [samplelog="$withval"], [samplelog="$xx_prefix/var/log/sample.log"])
+AC_DEFINE_UNQUOTED(SAM_DEF_LOGFILE, "$samplelog", default sample log file path.)
+AC_SUBST(samplelog)
+
+AC_ARG_ENABLE(f-prefix, [  --enable-f-prefix       install sample/samples/sampled as fsample/fsamples/fsampled [for filename conflicts]], [samplef="f"], [samplef=""])
+AC_SUBST(samplef)
+
+AC_ARG_ENABLE(overwrite, [  --enable-overwrite      force overwriting of sample/samples/sampled if they exist on the system.], [overwrite="yes"], [overwrite="no"])
+
+if test "$overwrite" != "yes" ; then
+if test "$samplef" != "f" ; then
+AC_CHECK_FILE("/usr/bin/sample", AC_MSG_ERROR([/usr/bin/sample exists.  configure with --enable-overwrite or --enable-f-prefix to bypass.]))
+AC_CHECK_FILE("/usr/local/bin/sample", AC_MSG_ERROR([/usr/local/bin/sample exists.  configure with --enable-overwrite or --enable-f-prefix to bypass.]))
+AC_CHECK_FILE("/usr/bin/samples", AC_MSG_ERROR([/usr/bin/samples exists.  configure with --enable-overwrite or --enable-f-prefix to bypass.]))
+AC_CHECK_FILE("/usr/local/bin/samples", AC_MSG_ERROR([/usr/local/bin/samples exists.  configure with --enable-overwrite or --enable-f-prefix to bypass.]))
+AC_CHECK_FILE("/usr/sbin/sampled", AC_MSG_ERROR([/usr/sbin/sampled exists.  configure with --enable-overwrite or --enable-f-prefix to bypass.]))
+AC_CHECK_FILE("/usr/local/sbin/sampled", AC_MSG_ERROR([/usr/local/sbin/sampled exists.  configure with --enable-overwrite or --enable-f-prefix to bypass.]))
+fi
+fi
+
+AC_OUTPUT([Makefile src/Makefile src/samputil etc/sample.conf])

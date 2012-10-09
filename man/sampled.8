@@ -1,0 +1,84 @@
+.\" sample daemon manual page.
+.TH "SAMPLED" "8" "August 2007" "fakehalo" "Sample"
+.SH "NAME"
+sampled \- sample daemon to process \fI~/.sample\fR, and related files
+.SH "SYNOPSIS"
+\fBsampled\fR
+[\fB\-vsSmM\fR] [\fB\-i\fR \fImin\fR] [\fB\-p\fR|\fB\-P\fR \fIpri\fR] [\fB\-c\fR \fIfile\fR] [\fB\-l\fR \fIfile\fR] [\fB\-d\fR \fIfile\fR]
+.SH "DESCRIPTION"
+.PP 
+\fBsampled\fR is a background daemon intended to be run at operating system launch time.  \fBsampled\fR processes the data of users with \fI~/.sample\fR, and related files to monitor specified outdated/oversized files.  in a sense, \fBsampled\fR does the file sampling itself.
+
+\fBsampled\fR, in most situations, should be launched via \fBsamputil\fR, the provided shell script interface.
+.SH "OPTIONS"
+all of the following command\-line options have corresponding values for use in the \fIsample.conf\fR configuration file, and it is recommended that configuration values are set there for consistent use.  however, all command\-line options override \fIsample.conf\fR configuration values.
+
+.TP 
+\fB\-v\fR
+shows the version information of sampled
+.TP 
+\fB\-s\fR
+allows users that have shells outside of the \fI/etc/shells\fR file to have processable \fI~/.sample\fR files (depending on the system, this may be a forced option)
+.TP 
+\fB\-S\fR
+allows users to set their own shell for handling outdated files.  this is set via the \fBSHELL=/path/to/sh\fR in the user's \fI~/.sample\fR file
+.TP 
+\fB\-m\fR
+allows multiple processes (processors) for a single user.  this is to say that if the previous instance of the sampled processor was running for a particular user it would allow the daemon to run another, where normally it would not.  essentially, this means, by default, a user is given one main process to handle their \fI~/.sample\fR files, this option turns that off and allows multiple processes (this will stop the monitoring of this level of processes due to potential overhead, which may result in less \fIsample.log\fR logging and minimal functionality loss)
+.TP 
+\fB\-M\fR
+allows multiple (sub) processes for a user's processor instance, so it does not wait for the previous (sub) process to finish.  this is a bad idea to enable, and leads to a high level of processes at one time (this will stop the monitoring of this level of processes due to potential overhead, which may result in less \fIsample.log\fR logging and minimal functionality loss)
+.TP 
+\fB\-i\fR \fImin\fR
+makes \fBsampled\fR process \fI~/.sample\fR files every \fImin\fR number of minute(s), instead of every single minute
+.TP 
+\fB\-p\fR \fIpri\fR
+makes the \fBsampled\fR user processes (processors) run with the process priority \fIpri\fR (\-20 to 20)
+.TP 
+\fB\-P\fR \fIpri\fR
+makes the \fBsampled\fR daemon (core) process run with the process priority \fIpri\fR (\-20 to 20)
+.TP 
+\fB\-c\fR \fIfile\fR
+specify an alternate \fIsample.conf\fR configuration file to use
+.TP 
+\fB\-l\fR \fIfile\fR
+specify an alternate log file to write \fBsampled\fR warnings/errors to
+.TP 
+\fB\-d\fR \fIfile\fR
+specify an alternate pid file to write to
+
+.SH "SIGNALS"
+.TP 
+\fBSIGHUP\fR
+stops all active \fBsampled\fR processors running at user\-level, but does not affect the root \fBsampled\fR daemon
+.TP 
+\fBSIGUSR1\fR
+cleanly exits \fBsampled\fR
+.TP 
+\fBSIGUSR2\fR
+clears \fBsampled\fR user\-cache.  this should be signaled if a (new) user is added to the system.  the cache is cleared automatically if \fI/etc/passwd\fR or \fI/etc/shells\fR (where available) are modified
+
+.SH "FILES"
+~/.sample			(explained in the \fBsample\fR manual)
+.br 
+~/.sample_spool/	(explained in the \fBsamples\fR manual)
+.br 
+/etc/sampletab/	(explained in the \fBsample\fR manual)
+.br 
+/etc/sample.conf	(explained in the \fBsample.conf\fR manual)
+.br 
+/etc/passwd		(if compiled with \-\-enable\-strict\-passwd)
+.br 
+/etc/shells		(where supported)
+.br 
+.SH "AUTHOR"
+Written by v9/fakehalo. [v9@fakehalo.us]
+.SH "BUGS"
+Report bugs to <v9@fakehalo.us>.
+.SH "COPYRIGHT"
+Copyright \(co 2007 fakehalo.
+.br 
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "SEE ALSO"
+sample(1) samples(1) sample.conf(5) samputil(8)

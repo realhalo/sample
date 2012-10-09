@@ -1,0 +1,30 @@
+To install sample, follow the usual steps:
+
+# cd sample-VERSION/
+
+On most systems, simply:
+# ./configure
+
+On OSX, /usr/bin/sample already exists, so use the following to rename
+sample/samples/sampled to fsample/fsamples/fsampled:
+# ./configure --enable-f-prefix
+
+# make
+
+# make install
+
+Start the daemon, this will need to be placed in your rc script(s) as well.
+This can also be launched by directly executing "/path/to/sampled":
+# samputil start
+
+As a user, to edit your ~/.sample file (with validation/etc):
+$ sample
+
+To test if the sample daemon (sampled) is running properly for the active
+user run the following set of commands. It will attempt to delete
+~/testfile if the file modification time is older than 1 second (essentially
+immediately). Sampled processes every minute, on the minute, so the file
+should disappear right around when the system clock hits :00 seconds.
+$ touch ~/testfile
+$ samples add ~/testfile M 1s "rm -f %s"
+

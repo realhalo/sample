@@ -1,0 +1,69 @@
+.\" sample single-instance client/interface manual page. (sample spooler)
+.TH "SAMPLES" "1" "August 2007" "fakehalo" "Sample"
+.SH "NAME"
+samples \- interface to add and delete ~/.sample_spool/ files
+.SH "SYNOPSIS"
+\fBsamples\fR \fBadd\fR [\fB\-\fR<\fIuser\fR>] <\fIfile\fR> <\fItype\fR> <\fItime\fR|\fIsize\fR> <\fIexec\fR> [\fIttl\fR] [\fIshell\fR]
+
+\fBsamples\fR \fBdel\fR [\fB\-\fR<\fIuser\fR>] <\fIfile\fR> ...
+
+\fBsamples\fR \fBwipe\fR [\fB\-\fR<\fIuser\fR>]
+.SH "DESCRIPTION"
+.PP 
+\fBsamples\fR is the single\-instance version of \fBsample\fR, if you have not read the \fBsample\fR manual yet you should read it first, as it contains the basic syntax used.  
+
+the \fBsamples\fR program creates and deletes files in \fI~/.sample_spool/\fR, which contain the exact same syntax/functionality as a \fI~/.sample\fR file.  the only two differences between a \fI~/.sample\fR file and a file in \fI~/.sample_spool/\fR is that after a command is triggered or a time\-to\-live limit is hit, the file in \fI~/.sample_spool/\fR will be deleted, making it a single\-instance.
+
+\fBsamples\fR is designed to monitor a single file per sample file.  however, this is not required.  custom files may be dropped in \fI~/.sample_spool/\fR and treated the same as a \fI~/.sample\fR file, except it is deleted afterwords. 
+
+if no file is matched (ie. it was deleted/moved) during a \fBsampled\fR processor run of \fI~/.sample_spool/\fR, it will delete the corresponding single-instance sample file automatically.
+.SH "OPTIONS"
+if \fBsamples\fR is run as root you can specify the \fB\-\fR<\fIuser\fR> argument to run \fBsamples\fR for a specified user, instead of root. (ie. "\-nobody")
+
+.TP 
+\fBadd\fR [\fB\-\fR<\fIuser\fR>] <\fIfile\fR> <\fItype\fR> <\fItime\fR|\fIsize\fR> <\fIexec\fR> [\fIttl\fR] [\fIshell\fR]
+add a single\-instance sample file that does the following, in literal form:
+
+"if \fItype\fR has past \fItime\fR for \fIfile\fR then run \fIexec\fR"
+
+OR, for filesize comparisons (where \fItype\fR is \fBS\fR or \fBs\fR):
+
+"if \fItype\fR is larger/smaller than \fIsize\fR for \fIfile\fR then run \fIexec\fR"
+
+if \fIttl\fR is specified; the single\-instance sample file will be deleted after the specified period of time.  the \fIttl\fR time format is the same as for monitoring times (ie. "1Y6M" is 1.5 years)
+
+if \fIshell\fR is specified; "SHELL=\fIshell\fR" will be placed in the single\-instance sample file (this may or may not be allowed depending on your \fIsample.conf\fR configuration)
+.TP 
+\fBdel\fR [\fB\-\fR<\fIuser\fR>] <\fIfile\fR> ...
+delete single\-instance sample file(s) that are monitoring \fIfile\fR.  multiple \fIfile\fR arguments allowed
+.TP 
+\fBwipe\fR [\fB\-\fR<\fIuser\fR>]
+deletes all single\-instance sample files
+.SH "EXAMPLE"
+.PP 
+
+.PP 
+.TP 
+example \fBsamples\fR command\-line usage might look like:
+
+\fB# samples add ~/README.TXT A 1w "mv \-\- %s ~/old" 1M\fR
+
+this example would monitor ~/README.TXT to see if it has been read/accessed (A) in the last week, if not it will execute "mv \-\- %s ~/old" and delete the corresponding sample file in \fI~/.sample_spool/\fR, so not to execute it again.  if the file is consistently read for 1 month the sample file will be deleted even though the command was never executed, as it hit the time\-to\-live (ttl)
+
+\fB# samples del ~/README.TXT\fR
+
+this example would delete any corresponding sample file(s) that are montioring ~/README.TXT
+.SH "FILES"
+~/.sample_spool/
+.br 
+.SH "AUTHOR"
+Written by v9/fakehalo. [v9@fakehalo.us]
+.SH "BUGS"
+Report bugs to <v9@fakehalo.us>.
+.SH "COPYRIGHT"
+Copyright \(co 2007 fakehalo.
+.br 
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "SEE ALSO"
+sample(1) sample.conf(5) sampled(8) samputil(8)

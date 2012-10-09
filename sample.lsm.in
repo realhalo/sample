@@ -1,0 +1,21 @@
+Begin4
+Title:		sample
+Version:	%VERSION%
+Entered-date:	%LSMTIME%
+Description:	Sample is the missing link in the POSIX-compliant 
+cron-family of task scheduling tools. Sample monitors files on a 
+user-by-user basis and waits for their timestamp/filesize to hit a 
+threshold thereby executing a specified command to handle the files.
+Keywords:	sample, samples, sampled, fsample, fsamples, fsampled, samputil
+Copying-policy:	GPL
+Author:		v9@fakehalo.us (vade79)
+Maintained-by:	v9@fakehalo.us (vade79)
+Primary-site:	sample.sourceforge.net /
+		%GZSIZE%
+		%BZ2SIZE%
+Alternate-site:	fakehalo.us /sample
+		%GZSIZE%
+		%BZ2SIZE%
+Platforms:	C Compiler ANSI/POSIX (GNU gcc). Built for Linux, FreeBSD, 
+OpenBSD, OSX, and Solaris. Most likely compliant on other operating systems.
+End

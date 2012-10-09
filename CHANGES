@@ -1,0 +1,18 @@
+(! = major, * = minor)
+
+version 1.3:
+* Changed support for configure's --prefix argument.  If supplied, will now
+  place all sample-related files inside that prefix directory.  If the
+  argument is not supplied sample-related files will be placed in an assumed
+  "best" standard place ("--prefix" is the only generic configure option used)
+* Added "%i" inode string replacement variable for commands.
+
+version 1.2:
+! First public release.
+* Packaged sample for release.
+* Created manpages.
+
+version 1.1:
+* Created the framework for the program.
+* Compile/operational modifications to work on Linux, OpenBSD, FreeBSD, 
+  OSX, and Solaris.

@@ -1,0 +1,6 @@
+(things i haven't decided if i need to do anything about or not)
+
+* Verify sample is 64bit compliant code.
+* Make an included API and associated language methods/functions.
+* Make module support for special sample types (distant future, if any)
+

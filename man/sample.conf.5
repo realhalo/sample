@@ -1,0 +1,99 @@
+.\" sample.conf manual page.
+.TH "SAMPLE.CONF" "5" "August 2007" "fakehalo" "Sample"
+.SH "NAME"
+sample.conf \- configuration options for \fBsampled\fR
+.SH "SYNOPSIS"
+\fI/etc/sample.conf\fR
+.SH "DESCRIPTION"
+.PP 
+\fBsample.conf\fR contains configutation settings for \fBsampled\fR to process at launch time.
+
+the supported options for \fBsample.conf\fR expect no extra spaces between option names and option values.  they are set as \fBoption=value\fR.
+
+the supported options are as follows:
+
+.TP 
+interval=\fBVALUE\fR
+makes \fBsampled\fR process \fI~/.sample\fR files every \fBVALUE\fR number of minute(s), instead of every single minute
+.TP 
+log_file=\fBVALUE\fR
+specify an alternate log file to write \fBsampled\fR warnings/errors to
+.TP 
+pid_file=\fBVALUE\fR
+specify an alternate pid file to write to
+.TP 
+user_priority=\fBVALUE\fR
+makes the \fBsampled\fR user processes (processors) run with the process priority \fBVALUE\fR (\-20 to 20)
+.TP 
+daemon_priority=\fBVALUE\fR
+makes the \fBsampled\fR daemon (core) process run with the process priority \fBVALUE\fR (\-20 to 20)
+.TP 
+[\fB+\-\fR]allow_noshell
+allows users that have shells outside of the \fI/etc/shells\fR file to have processable \fI~/.sample\fR files (depending on the system, this may be a forced option)
+.TP 
+[\fB+\-\fR]allow_setshell
+allows users to set their own shell for handling outdated files.  this is set via the \fBSHELL=/path/to/sh\fR in the user's \fI~/.sample\fR file
+.TP 
+[\fB+\-\fR]allow_multiple_processes
+allows multiple processes (processors) for a single user.  this is to say that if the previous instance of the sampled processor was running for a particular user it would allow the daemon to run another, where normally it would not.  essentially, this means, by default, a user is given one main process to handle their \fI~/.sample\fR files, this option turns that off and allows multiple processest (this will stop the monitoring of this level of processes due to potential overhead, which may result in less \fIsample.log\fR logging and minimal functionality loss)
+.TP 
+[\fB+\-\fR]allow_multiple_user_processes
+allows multiple (sub) processes for a user's processor instance, so it does not wait for the previous (sub) process to finish.  this is a bad idea to enable, and leads to a high level of processes at one time (this will stop the monitoring of this level of processes due to potential overhead, which may result in less \fIsample.log\fR logging and minimal functionality loss)
+.TP 
+users_allow=\fBUSER\fR:\fBUSER\fR:...
+allows only the specified list of users to have executable \fI~/.sample\fR files.  by default, all users are allowed (\fBusers_allow\fR and \fBuser_deny\fR cannot be used together, if multiple instances are set only the first one will be used)
+.TP 
+users_deny=\fBUSER\fR:\fBUSER\fR:...
+disallows the specified list of users from having executable \fI~/.sample\fR files, and allows all other users.  by default, all users are allowed (\fBusers_allow\fR and \fBuser_deny\fR cannot be used together, if multiple instances are set only the first one will be used)
+.TP 
+limit_cpu=\fBVALUE\fR
+limit cpu usage to \fBVALUE\fR seconds of actual processor usage before it is killed, RLIMIT_CPU equivalent (0 is ignored, option where available)
+.TP 
+limit_processes=\fBVALUE\fR
+RLIMIT_NPROC equivalent (0 is ignored, option where available)
+.TP 
+limit_stack=\fBVALUE\fR
+RLIMIT_STACK equivalent (0 is ignored, option where available)
+.TP 
+limit_data=\fBVALUE\fR
+RLIMIT_DATA equivalent (0 is ignored, option where available)
+.TP 
+limit_files=\fBVALUE\fR
+RLIMIT_NOFILE equivalent (0 is ignored, option where available)
+.TP 
+limit_filesize=\fBVALUE\fR
+RLIMIT_FSIZE equivalent (0 is ignored, option where available)
+.TP 
+limit_rss=\fBVALUE\fR
+RLIMIT_RSS equivalent (0 is ignored, option where available)
+.TP 
+spool_maxfiles=\fBVALUE\fR
+process a maximum \fBVALUE\fR of spooled sample (\fI~/.sample_spool/*\fR) files per user for a given sample processor (\fBsamples\fR related)
+.TP 
+spool_ttl_default=\fBVALUE\fR
+uses \fBVALUE\fR as the time\-to\-live value for spooled sample files (\fI~/.sample_spool/*\fR), if no time\-to\-live was specified from the \fBsamples\fR program (\fBsamples\fR related)
+.TP 
+spool_ttl_max=\fBVALUE\fR
+uses \fBVALUE\fR as the maximum time\-to\-live value for spooled sample files (\fI~/.sample_spool/*\fR), this will override user\-specified time\-to\-live values (\fBsamples\fR related)
+.TP 
+[\fB+\-\fR]disable_tabs
+disable processing of \fI/etc/sampletab/*\fR files.
+.TP 
+[\fB+\-\fR]disable_sample
+disable processing of \fI~/.sample\fR files.
+.TP 
+[\fB+\-\fR]disable_spools
+disable processing of \fI~/.sample_spool/*\fR files.
+
+
+.SH "AUTHOR"
+Written by v9/fakehalo. [v9@fakehalo.us]
+.SH "BUGS"
+Report bugs to <v9@fakehalo.us>.
+.SH "COPYRIGHT"
+Copyright \(co 2007 fakehalo.
+.br 
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+.SH "SEE ALSO"
+sample(1) samples(1) sampled(8) samputil(8)

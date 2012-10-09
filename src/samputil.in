@@ -1,0 +1,143 @@
+#!/bin/sh
+#
+# samputil: Utility script for easily interfacing with sampled.
+# (based on apachectl)
+#
+# The exit codes returned are:
+#       0 - operation completed successfully
+#       1 -
+#       2 - sampled could not be started
+#       3 - sampled could not be stopped
+#       4 - sampled could not be restarted
+#       5 - sampled could not be reset
+#       6 - sampled usage error
+#
+# When multiple arguments are given, only the error from the _last_
+# one is reported.  Run "samputil help" for usage info.
+
+PIDFILE="@samplepid@"
+SAMPLED="@prefix@/sbin/@samplef@sampled"
+SAMPLED_FLAGS=""
+
+ERROR=0
+ARGV="$@"
+if [ "x$ARGV" = "x" ] ; then 
+    ARGS="help"
+fi
+
+for ARG in $@ $ARGS
+do
+    # check for pidfile
+    if [ -f $PIDFILE ] ; then
+	PID=`cat $PIDFILE`
+	if [ "x$PID" != "x" ] && kill -0 $PID 2>/dev/null ; then
+	    STATUS="sampled (pid $PID) running"
+	    RUNNING=1
+	else
+	    STATUS="sampled (pid $PID?) not running"
+	    RUNNING=0
+	fi
+    else
+	STATUS="sampled (no pid file) not running"
+	RUNNING=0
+    fi
+
+    case $ARG in
+    start)
+	if [ $RUNNING -eq 1 ]; then
+	    echo "$0 $ARG: sampled (pid $PID) already running"
+	    continue
+	fi
+	if $SAMPLED $SAMPLED_FLAGS ; then
+	    echo "$0 $ARG: sampled started"
+	else
+	    echo "$0 $ARG: sampled could not be started"
+	    ERROR=2
+	fi
+	;;
+    stop)
+	if [ $RUNNING -eq 0 ]; then
+	    echo "$0 $ARG: $STATUS"
+	    continue
+	fi
+	if kill -USR1 $PID ; then
+	    echo "$0 $ARG: sampled stopped"
+	    rm -f $PIDFILE
+	else
+	    echo "$0 $ARG: sampled could not be stopped"
+	    ERROR=3
+	fi
+	;;
+    restart)
+	if [ $RUNNING -eq 0 ]; then
+	    echo "$0 $ARG: sampled not running, trying to start"
+	    if $SAMPLED SAMPLED_FLAGS ; then
+	        echo "$0 $ARG: sampled started"
+	    else
+	        echo "$0 $ARG: sampled could not be started"
+	        ERROR=4
+	    fi
+	else
+	    if kill -USR1 $PID ; then
+	        rm -f $PIDFILE
+		sleep 1
+	        if $SAMPLED SAMPLED_FLAGS ; then
+	            echo "$0 $ARG: sampled restarted"
+	        else
+	            echo "$0 $ARG: sampled could not be restarted"
+	            ERROR=4
+	        fi
+	    else
+	        echo "$0 $ARG: sampled could not be restarted"
+	        ERROR=4
+	    fi
+	fi
+	;;
+    reset)
+	if [ $RUNNING -eq 0 ]; then
+	    echo "$0 $ARG: $STATUS"
+	    continue
+	fi
+	if kill -HUP $PID ; then
+	    echo "$0 $ARG: sampled reset processors, if were are running"
+	else
+	    echo "$0 $ARG: sampled processors could not be reset"
+	    ERROR=5
+	fi
+	;;
+    clear)
+	if [ $RUNNING -eq 0 ]; then
+	    echo "$0 $ARG: $STATUS"
+	    continue
+	fi
+	if kill -USR2 $PID ; then
+	    echo "$0 $ARG: sampled cleared its user cache"
+	else
+	    echo "$0 $ARG: sampled user cache could not be cleared"
+	    ERROR=5
+	fi
+	;;
+    status)
+	echo $STATUS
+	;;
+    *)
+	echo "usage: $0 [ start | stop | restart | reset | clear | status ]"
+	cat <<EOF
+
+start      - start sampled
+stop       - stop sampled
+restart    - restart sampled
+reset      - reset sampled (kills all sampled processors, not the daemon)
+clear      - clear sampled user cache
+status     - reports the running status of sampled
+help       - this screen
+
+EOF
+	ERROR=6
+    ;;
+
+    esac
+
+done
+
+exit $ERROR
